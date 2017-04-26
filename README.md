@@ -3,8 +3,10 @@ A repository of jupyter notebooks containing examples, tutorials and demos to de
 
 To run a notebook:
 
+```bash
 cd /<path>/<to>/<aiida_demos>/notebooks
 jupyter notebook
+```
 
 A Jupyter tab should open in your browser from which you can select the notebook you want to run.
 
