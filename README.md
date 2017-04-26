@@ -1,5 +1,5 @@
 # aiida_demos
-A repository of jupyter notebooks containing examples, tutorials and demos to demonstrate AiiDA functionality
+A repository of jupyter notebooks containing examples, tutorials and demos of AiiDA.
 
 To run a notebook:
 
