@@ -3,7 +3,6 @@ import sys, json, copy
 
 
 def remove_lines_from_cell(cell, remove_from_string, remove_to_string, remove_string):
-    
     indices_to_remove = set()
     first_line_solution = None
     last_line_solution = None
@@ -26,12 +25,9 @@ def remove_lines_from_cell(cell, remove_from_string, remove_to_string, remove_st
 
     [cell['source'].pop(idx) for idx in sorted(indices_to_remove, reverse=True)]
 
-    
-
 
 
 def make_notebook(template_file_name, tutorial_file_name=None, solution_file_name=None):
-
     if tutorial_file_name is None and solution_file_name is None:
         print "Nothing to do"
         return
@@ -52,10 +48,6 @@ def make_notebook(template_file_name, tutorial_file_name=None, solution_file_nam
             remove_lines_from_cell(cell, '#TUT_USER_START', '#TUT_USER_END', '#TUT_SOLUTION')
         with open(solution_file_name, 'w') as f:
             json.dump(solution, f)
-
-
-
-
 
 
 if __name__ == '__main__':
