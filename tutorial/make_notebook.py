@@ -28,6 +28,10 @@ def remove_lines_from_cell(cell, remove_from_string, remove_to_string, remove_st
 
 
 def make_notebook(template_file_name, tutorial_file_name=None, solution_file_name=None):
+    """
+    Master function to create requested notebooks
+    
+    """
     if tutorial_file_name is None and solution_file_name is None:
         print "Nothing to do"
         return
@@ -52,7 +56,7 @@ def make_notebook(template_file_name, tutorial_file_name=None, solution_file_nam
 
 if __name__ == '__main__':
     from argparse import ArgumentParser
-    parser = ArgumentParser()
+    parser = ArgumentParser("To make the user version and a solution version:\npython make_notebook.py template.ipynb -t tutorial.ipynb -s solution.ipynb")
     parser.add_argument('template', help='Provide the template the contains both versions, tutorial and solution', type=str)
     parser.add_argument('-t', '--tutorial', help='Make version for the tutorial and store in this file', type=str)
     parser.add_argument('-s', '--solution', help='Make the solution and store in this file', type=str)
