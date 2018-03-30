@@ -1,5 +1,5 @@
 from create_rescale import create_diamond_fcc, rescale
-from common_wf import get_pseudos, generate_scf_input_params
+from common_wf import generate_scf_input_params
 from aiida.work.run import run
 from aiida.work.workfunction import workfunction as wf
 from aiida.orm.data.base import Str, Float
