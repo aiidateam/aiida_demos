@@ -3,8 +3,7 @@ from aiida.backends.utils import load_dbenv, is_dbenv_loaded
 if not is_dbenv_loaded():
     load_dbenv()
 
-from aiida.orm import load_node
-from aiida.orm.utils import DataFactory
+from aiida.orm import load_node, CalculationFactory, DataFactory
 from aiida.orm.data.base import Float, Str, NumericType, BaseType
 from aiida.orm.code import Code
 from aiida.orm.data.structure import StructureData
@@ -13,7 +12,9 @@ from aiida.work.process_registry import ProcessRegistry
 from aiida.work.workchain import WorkChain, ToContext, while_, Outputs
 from common_wf import generate_scf_input_params
 from create_rescale import rescale, create_diamond_fcc
-from aiida.orm.calculation.job.quantumespresso.pw import PwCalculation
+
+
+PwCalculation = CalculationFactory('quantumespresso.pw')
 
 GPa_to_eV_over_ang3 = 1./160.21766208
 
@@ -99,9 +100,9 @@ class PressureConvergence(WorkChain):
         """
     	super(PressureConvergence, cls).define(spec)
         spec.input("structure", valid_type=StructureData)
-        spec.input("volume_tolerance", valid_type=NumericType) #, default=Float(0.1))
-        spec.input("code", valid_type=BaseType)
-        spec.input("pseudo_family", valid_type=BaseType)
+        spec.input("volume_tolerance", valid_type=Float) #, default=Float(0.1))
+        spec.input("code", valid_type=Code)
+        spec.input("pseudo_family", valid_type=Str)
         spec.outline(
             cls.init,
             cls.put_step0_in_ctx,

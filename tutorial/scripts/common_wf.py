@@ -3,10 +3,11 @@ from aiida.backends.utils import load_dbenv, is_dbenv_loaded
 if not is_dbenv_loaded():
     load_dbenv()
 
-from aiida.orm import DataFactory
-from aiida.orm.calculation.job.quantumespresso.pw import PwCalculation
+from aiida.orm import CalculationFactory, DataFactory
 from aiida.orm.code import Code
 import numpy as np
+
+PwCalculation = CalculationFactory('quantumespresso.pw')
 
 
 def get_pseudos(structure, family_name):

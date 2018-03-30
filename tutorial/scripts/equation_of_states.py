@@ -3,9 +3,10 @@ from common_wf import get_pseudos, generate_scf_input_params
 from aiida.work.workchain import WorkChain, ToContext, Outputs
 from aiida.work.run import run, submit
 from aiida.orm.data.base import Str, Float
-from aiida.orm.calculation.job.quantumespresso.pw import PwCalculation
 from aiida.work.process_registry import ProcessRegistry
-from aiida.orm import DataFactory
+from aiida.orm import CalculationFactory, DataFactory
+
+PwCalculation = CalculationFactory('quantumespresso.pw')
     
 scale_facs = (0.96, 0.98, 1.0, 1.02, 1.04)
 labels = ["c1", "c2", "c3", "c4", "c5"]
