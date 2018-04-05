@@ -48,19 +48,21 @@ def get_start_widget(appbase, jupbase, notebase):
     from aiida.orm import load_node
     from aiida.common.exceptions import NotExistent
 
-    need_sample_data_template = """<div class="alert alert-box alert-warning">
+    need_sample_data_template = """<br><br><!--<div class="alert alert-box alert-info">-->
     For most of them, you first need to <emph>import some sample data</emph>,
     that you can do <a href="{notebase}/notebooks/import_sample_data.ipynb" target="_blank">
-    using this simple notebook</a>.</div>""".format(notebase=notebase,
+    using this simple notebook</a>.<!--</div>-->""".format(notebase=notebase,
                                                     jupbase=jupbase,
                                                     appbase=appbase)
 
-    try:
-        n = load_node('2bc836d1-02ee-4d5e-acc3-925f0878d767')
-        need_sample_data = "" # No message to show
-    except NotExistent:
-        need_sample_data = need_sample_data_template # Show the warning
-    
+    ## Commented for now, to avoid that it is too slow loading
+    ## One solution could be to cache in some temporary location
+    #try:
+    #    n = load_node('2bc836d1-02ee-4d5e-acc3-925f0878d767')
+    #    need_sample_data = "" # No message to show
+    #except NotExistent:
+    #    need_sample_data = need_sample_data_template # Show the warning
+    need_sample_data = need_sample_data_template
     
     html = template.format(appbase=appbase, jupbase=jupbase,
                            notebase=notebase, need_sample_data=need_sample_data)
