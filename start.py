@@ -42,11 +42,11 @@ def get_start_widget(appbase, jupbase, notebase):
 
     </tr></table></div>
 """
-    from aiida import is_dbenv_loaded, load_dbenv
-    if not is_dbenv_loaded():
-        load_dbenv()
-    from aiida.orm import load_node
-    from aiida.common.exceptions import NotExistent
+    #from aiida import is_dbenv_loaded, load_dbenv
+    #if not is_dbenv_loaded():
+    #    load_dbenv()
+    #from aiida.orm import load_node
+    #from aiida.common.exceptions import NotExistent
 
     need_sample_data_template = """<br><br><!--<div class="alert alert-box alert-info">-->
     For most of them, you first need to <emph>import some sample data</emph>,
