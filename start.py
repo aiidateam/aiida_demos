@@ -50,7 +50,7 @@ def get_start_widget(appbase, jupbase, notebase):
 
     need_sample_data_template = """<div class="alert alert-box alert-warning">
     For most of them, you first need to <emph>import some sample data</emph>,
-    that you can do <a href="{notebase}/notebooks/import_sample_data.ipynb">
+    that you can do <a href="{notebase}/notebooks/import_sample_data.ipynb" target="_blank">
     using this simple notebook</a>.</div>""".format(notebase=notebase,
                                                     jupbase=jupbase,
                                                     appbase=appbase)
