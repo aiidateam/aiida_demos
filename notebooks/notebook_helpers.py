@@ -89,3 +89,48 @@ def get_code_pwonly_dropdown():
 
     return code_group
 
+def generate_query_graph(qh, out_file_name):
+
+    def draw_vertice_settings(idx, vertice, **kwargs):
+        """
+        Returns a string with all infos needed in a .dot file  to define a node of a graph.
+        :param node:
+        :param kwargs: Additional key-value pairs to be added to the returned string
+        :return: a string
+        """
+        if 'calculation' in vertice['type']:
+            shape = "shape=polygon,sides=4"
+        elif 'code' in vertice['type']:
+            shape = "shape=diamond"
+        else:
+            shape = "shape=ellipse"
+        filters = kwargs.pop('filters', None)
+        additional_string = ""
+        if filters:
+            additional_string += '\nFilters:'
+            for k,v in filters.items():
+                additional_string += "\n   {} : {}".format(k,v)
+
+
+        label_string = " ('{}')".format(vertice['tag'])
+
+        labelstring = 'label="{} {}{}"'.format(
+            vertice['type'], #.split('.')[-2] or 'Node',
+            label_string,
+            additional_string)
+        #~ return "N{} [{},{}{}];".format(idx, shape, labelstring,
+        return "{} [{},{}];".format(vertice['tag'], shape, labelstring)
+    nodes = {v['tag']:draw_vertice_settings(idx, v, filters=qh['filters'][v['tag']]) for idx, v in enumerate(qh['path'])}
+    links = [(v['tag'], v['joining_value'], v['joining_keyword']) for v in qh['path'][1:]]
+
+    with open('temp.dot','w') as fout:
+        fout.write("digraph G {\n")
+        for l in links:
+            fout.write('    {} -> {} [label=" {}"];\n'.format(*l))
+        for _, n_values in nodes.items():
+            fout.write("    {}\n".format(n_values))
+
+        fout.write("}\n")
+    import os
+    os.system('dot temp.dot -Tpng -o {}'.format(out_file_name))
+    
