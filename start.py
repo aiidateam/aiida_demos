@@ -11,10 +11,8 @@ def get_start_widget(appbase, jupbase, notebase):
     <div style="line-height: 1.4;" class="CustomLiMarginAiiDADemos">
     <p style="margin-bottom: 10px;">
     This app contains a number of simple Jupyter notebooks that
-    show and demo basic features of AiiDA.<br>
-    For most of them, you first need to <emph>import some sample data</emph>,
-    that you can do <a href="{notebase}/notebooks/import_sample_data.ipynb">
-    using this simple notebook</a>.
+    show and demo basic features of AiiDA.
+    {need_sample_data}
     </p>
     <table>
     <tr>
@@ -44,8 +42,26 @@ def get_start_widget(appbase, jupbase, notebase):
 
     </tr></table></div>
 """
+    from aiida import is_dbenv_loaded, load_dbenv
+    if not is_dbenv_loaded():
+        load_dbenv()
+    from aiida.orm import load_node
+    from aiida.common.exceptions import NotExistent
+
+    need_sample_data_template = """<div class="alert alert-box alert-warning">
+    For most of them, you first need to <emph>import some sample data</emph>,
+    that you can do <a href="{notebase}/notebooks/import_sample_data.ipynb">
+    using this simple notebook</a>.</div>"""
+
+    try:
+        n = load_node('2bc836d1-02ee-4d5e-acc3-925f0878d767')
+        need_sample_data = "" # No message to show
+    except NotExistent:
+        need_sample_data = need_sample_data_template # Show the warning
     
-    html = template.format(appbase=appbase, jupbase=jupbase, notebase=notebase)
+    
+    html = template.format(appbase=appbase, jupbase=jupbase,
+                           notebase=notebase, need_sample_data=need_sample_data)
     return ipw.HTML(html)
     
 #EOF
