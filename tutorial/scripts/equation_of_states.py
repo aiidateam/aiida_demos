@@ -1,9 +1,8 @@
 from create_rescale import create_diamond_fcc, rescale
 from common_wf import generate_scf_input_params
-from aiida.work.workchain import WorkChain, ToContext, Outputs
+from aiida.work.workchain import WorkChain, ToContext
 from aiida.work.run import run, submit
 from aiida.orm.data.base import Str, Float
-from aiida.work.process_registry import ProcessRegistry
 from aiida.orm import CalculationFactory, DataFactory
 
 PwCalculation = CalculationFactory('quantumespresso.pw')
@@ -22,10 +21,9 @@ class EquationOfStates(WorkChain):
             cls.run_pw,
             cls.return_results,
         )
-        spec.dynamic_output()
 
     def run_pw(self):
-        print "Workchain node identifiers: {}".format(ProcessRegistry().current_calc_node)
+        print "Workchain node identifiers: {}".format(self.calc)
         #Instantiate a JobCalc process and create basic structure
         JobCalc = PwCalculation.process()
         self.ctx.s0 = create_diamond_fcc(Str(self.inputs.element))
@@ -37,7 +35,7 @@ class EquationOfStates(WorkChain):
             inputs = generate_scf_input_params(s, str(self.inputs.code), self.inputs.pseudo_family)
             print "Running a scf for {} with scale factor {}".format(self.inputs.element, factor)
             future = submit(JobCalc, **inputs)
-            calcs[label] = Outputs(future)
+            calcs[label] = future
           
         # Ask the workflow to continue when the results are ready and store them
         # in the context
@@ -46,7 +44,7 @@ class EquationOfStates(WorkChain):
     def return_results(self):
         eos = []
         for label in labels:
-            eos.append(get_info(self.ctx[label]))
+            eos.append(get_info(self.ctx[label].get_outputs_dict()))
 
         #Return information to plot the EOS
         ParameterData = DataFactory("parameter")
