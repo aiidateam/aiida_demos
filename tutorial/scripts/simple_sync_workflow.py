@@ -1,9 +1,8 @@
 from create_rescale import create_diamond_fcc, rescale
 from common_wf import generate_scf_input_params
-from aiida.work.run import run
-from aiida.work.workfunction import workfunction as wf
+from aiida.work import run, Process
+from aiida.work import workfunction as wf
 from aiida.orm.data.base import Str, Float
-from aiida.work.process_registry import ProcessRegistry
 from aiida.orm import CalculationFactory, DataFactory
 
 PwCalculation = CalculationFactory('quantumespresso.pw')
@@ -13,7 +12,7 @@ labels = ["c1", "c2", "c3", "c4", "c5"]
 
 @wf
 def run_eos_wf(codename, pseudo_family, element):
-    print "Workfunction node identifiers: {}".format(ProcessRegistry().current_calc_node)
+    print "Workfunction node identifiers: {}".format(Process.current().calc)
     #Instantiate a JobCalc process and create basic structure
     JobCalc = PwCalculation.process()
     s0 = create_diamond_fcc(Str(element))
@@ -21,7 +20,7 @@ def run_eos_wf(codename, pseudo_family, element):
     calcs = {}
     for label, factor in zip(labels, scale_facs):
         s = rescale(s0,Float(factor))
-        inputs = generate_scf_input_params(s, str(codename), str(pseudo_family))
+        inputs = generate_scf_input_params(s, str(codename), Str(pseudo_family))
         print "Running a scf for {} with scale factor {}".format(element, factor)
         result = run(JobCalc,**inputs)
         calcs[label] = get_info(result)
