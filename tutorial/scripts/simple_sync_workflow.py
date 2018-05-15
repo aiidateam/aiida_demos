@@ -23,6 +23,7 @@ def run_eos_wf(codename, pseudo_family, element):
         inputs = generate_scf_input_params(s, str(codename), Str(pseudo_family))
         print "Running a scf for {} with scale factor {}".format(element, factor)
         result = run(JobCalc,**inputs)
+        print "RESULT: {}".format(result)
         calcs[label] = get_info(result)
 
     eos = []
@@ -44,7 +45,7 @@ def get_info(calc_results):
             calc_results['output_parameters'].dict.energy,
             calc_results['output_parameters'].dict.energy_units)
 
-def run_eos(codename='pw-5.1@localhost', pseudo_family='GBRV_lda', element="Si"):
+def run_eos(codename='qe-pw-6.2.1@localhost', pseudo_family='GBRV_lda', element="Si"):
     return run_eos_wf(Str(codename), Str(pseudo_family), Str(element))
 
 if __name__ == '__main__':

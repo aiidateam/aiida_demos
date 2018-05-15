@@ -34,7 +34,7 @@ class EquationOfStates(WorkChain):
         calcs = {}
         for label, factor in zip(labels, scale_facs):
             s = rescale(self.ctx.s0,Float(factor))
-            inputs = generate_scf_input_params(s, str(self.inputs.code), str(self.inputs.pseudo_family))
+            inputs = generate_scf_input_params(s, str(self.inputs.code), self.inputs.pseudo_family)
             print "Running a scf for {} with scale factor {}".format(self.inputs.element, factor)
             future = submit(JobCalc, **inputs)
             calcs[label] = Outputs(future)
@@ -62,7 +62,7 @@ def get_info(calc_results):
             calc_results['output_parameters'].dict.energy,
             calc_results['output_parameters'].dict.energy_units)
 
-def run_eos(element="Si", code='pw-5.1@localhost', pseudo_family='GBRV_lda'):
+def run_eos(element="Si", code='qe-pw-6.2.1@localhost', pseudo_family='GBRV_lda'):
     return run(EquationOfStates, element=Str(element), code=Str(code), pseudo_family=Str(pseudo_family))
 
 if __name__ == '__main__':

@@ -17,7 +17,7 @@ PwCalculation = CalculationFactory('quantumespresso.pw')
 
 GPa_to_eV_over_ang3 = 1./160.21766208
 
-def run_eos(structure, element="Si", code='pw-5.1', pseudo_family='GBRV_lda'):
+def run_eos(structure, element="Si", code='qe-pw-6.2.1@localhost', pseudo_family='GBRV_lda'):
     return run(PressureConvergence, structure=structure, code=Str(code), pseudo_family=Str(pseudo_family), volume_tolerance=Float(0.1))
 
 
@@ -103,16 +103,16 @@ class PressureConvergence(WorkChain):
         spec.input("code", valid_type=Str)
         spec.input("pseudo_family", valid_type=Str)
         spec.outline(
-            cls.init,
+            cls.setup,
             cls.put_step0_in_ctx,
             cls.move_next_step,
             while_(cls.not_converged)(
                 cls.move_next_step,
             ),
-            cls.report
+            cls.finish
         )
 
-    def init(self):
+    def setup(self):
         """
         Launch the first calculation for the input structure,
         and a second calculation for a shifted volume (increased by 4 angstrom^3)
@@ -128,7 +128,7 @@ class PressureConvergence(WorkChain):
 
         scaled_structure = get_structure(self.inputs.structure, new_volume)
         inputs1 = generate_scf_input_params(
-            scaled_structure, str(self.inputs.code), str(self.inputs.pseudo_family))
+            scaled_structure, str(self.inputs.code), self.inputs.pseudo_family)
 
         self.ctx.last_structure = scaled_structure
 
@@ -143,7 +143,7 @@ class PressureConvergence(WorkChain):
         """
         Store the outputs of the very first step in a specific dictionary
         """
-        V, E, dE = get_volume_energy_and_derivative(self.ctx.r0.get_outputs_dict()('output_parameters'))
+        V, E, dE = get_volume_energy_and_derivative(self.ctx.r0.get_outputs_dict()['output_parameters'])
 
         self.ctx.step0 = {'V': V, 'E': E, 'dE': dE}
 
@@ -179,7 +179,7 @@ class PressureConvergence(WorkChain):
         self.ctx.last_structure = scaled_structure
 
         inputs = generate_scf_input_params(
-            scaled_structure, str(self.inputs.code), str(self.inputs.pseudo_family))
+            scaled_structure, str(self.inputs.code), self.inputs.pseudo_family)
 
         # Run PW                                                                                                                     
         future = submit(PwProcess, **inputs)
@@ -198,7 +198,7 @@ class PressureConvergence(WorkChain):
                    r0_out['output_parameters'].dict.volume) > self.inputs.volume_tolerance
 
 
-    def report(self):
+    def finish(self):
         """
         Output final quantities
         """
