@@ -1,6 +1,8 @@
 #!/bin/bash -e
 
 # This script is executed whenever the docker container is (re)started.
+export AIIDA_HOME=$HOME
+export SCRIPTS=${HOME}/.local
 
 #===============================================================================
 # debugging
@@ -47,7 +49,6 @@ if [ ! -d ${AIIDA_HOME}/.aiida ]; then
    # start the daemon
    verdi daemon start
 
-
 else
     if [ $aiida_backend = "django" ]; then
         verdi daemon stop || true
@@ -78,15 +79,6 @@ fi
 
 # update the list of installed plugins
 grep "reentry scan" ${AIIDA_HOME}/.bashrc || echo "reentry scan" >> ${AIIDA_HOME}/.bashrc
-
-#===============================================================================
-# generate ssh key
-if [ ! -e ${AIIDA_HOME}/.ssh/id_rsa ]; then
-   mkdir -p ${AIIDA_HOME}/.ssh
-   ssh-keygen -f ${AIIDA_HOME}/.ssh/id_rsa -t rsa -N ''
-fi
-
-
 
 #===============================================================================
 # install/upgrade apps
