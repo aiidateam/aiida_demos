@@ -1,3 +1,4 @@
+[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/ltalirz/aiida_demos/master)
 # aiida_demos
 A repository of jupyter notebooks containing examples, tutorials and demos of AiiDA.
 
