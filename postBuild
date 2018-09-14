@@ -1,6 +1,7 @@
 #!/bin/bash
 jupyter nbextension     enable --py --sys-prefix appmode
 jupyter serverextension enable --py --sys-prefix appmode
+reentry scan
 
 # set up AiiDA profile
 source .local/start-singleuser.sh
@@ -12,5 +13,3 @@ ln -s ${AIIDALAB_HOME} ${AIIDALAB_APPS}/aiida_demos
 
 # stop postgres properly (makes restart faster)
 psql_stop 
-
-

@@ -49,13 +49,12 @@ if [ ! -d ${AIIDALAB_HOME}/.aiida ]; then
    #verdi devel setproperty logging.celery_loglevel DEBUG
    #verdi devel setproperty logging.aiida_loglevel DEBUG
 
-   # start the daemon
-   verdi daemon start
+   # start the daemon verdi daemon start
 
 else
     if [ $aiida_backend = "django" ]; then
         verdi daemon stop || true
-        echo "yes" | python /usr/local/lib/python2.7/dist-packages/aiida/backends/djsite/manage.py --aiida-profile=default migrate
+        echo "yes" | python /srv/conda/envs/kernel/lib/python2.7/site-packages/aiida/backends/djsite/manage.py --aiida-profile=default migrate
         verdi daemon start
     fi
 fi
