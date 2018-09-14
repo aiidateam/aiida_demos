@@ -1,10 +1,8 @@
-jupyter nbextension     enable --py --sys-prefix appmode
-jupyter serverextension enable --py --sys-prefix appmode
+# enable appmode
 reentry scan
 
 # enter python2 environment
 echo "source activate kernel" >> ~/.bashrc
-
 
 .local/start-singleuser.sh
 

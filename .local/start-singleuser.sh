@@ -1,8 +1,8 @@
 #!/bin/bash -e
 
 # This script is executed whenever the docker container is (re)started.
-export AIIDA_HOME=$HOME
-export SCRIPTS=${HOME}/.local
+export AIIDALAB_HOME=$HOME
+export AIIDALAB_SCRIPTS=${HOME}/.local
 
 #===============================================================================
 # debugging
@@ -10,19 +10,19 @@ set -x
 
 #===============================================================================
 # start postgresql
-source ${SCRIPTS}/postgres.sh
+source ${AIIDALAB_SCRIPTS}/postgres.sh
 psql_start
 
 #===============================================================================
 # environment
-export PYTHONPATH=${AIIDA_HOME}
+export PYTHONPATH=${AIIDALAB_HOME}
 export SHELL=/bin/bash
 
 #===============================================================================
 # setup AiiDA
 aiida_backend=django
 
-if [ ! -d ${AIIDA_HOME}/.aiida ]; then
+if [ ! -d ${AIIDALAB_HOME}/.aiida ]; then
    verdi setup                          \
       --non-interactive                 \
       --email some.body@xyz.com         \
@@ -35,7 +35,7 @@ if [ ! -d ${AIIDA_HOME}/.aiida ]; then
       --db_name aiidadb                 \
       --db_host localhost               \
       --db_port 5432                    \
-      --repo ${AIIDA_HOME}/aiida_repository \
+      --repo ${AIIDALAB_HOME}/aiida_repository \
       default
 
    verdi profile setdefault verdi default
@@ -59,9 +59,9 @@ fi
 
 #===============================================================================
 # setup AiiDA jupyter extension
-if [ ! -e ${AIIDA_HOME}/.ipython/profile_default/ipython_config.py ]; then
-   mkdir -p ${AIIDA_HOME}/.ipython/profile_default/
-   echo > ${AIIDA_HOME}/.ipython/profile_default/ipython_config.py <<EOF
+if [ ! -e ${AIIDALAB_HOME}/.ipython/profile_default/ipython_config.py ]; then
+   mkdir -p ${AIIDALAB_HOME}/.ipython/profile_default/
+   echo > ${AIIDALAB_HOME}/.ipython/profile_default/ipython_config.py <<EOF
 c = get_config()
 c.InteractiveShellApp.extensions = [
    'aiida.common.ipython.ipython_magics'
@@ -71,36 +71,25 @@ fi
 
 #===============================================================================
 # create bashrc
-if [ ! -e ${AIIDA_HOME}/.bashrc ]; then
-   cp -v /etc/skel/.bashrc /etc/skel/.bash_logout /etc/skel/.profile ${AIIDA_HOME}/
-   echo 'eval "$(verdi completioncommand)"' >> ${AIIDA_HOME}/.bashrc
-   echo 'export PYTHONPATH="${AIIDA_HOME}"' >> ${AIIDA_HOME}/.bashrc
+if [ ! -e ${AIIDALAB_HOME}/.bashrc ]; then
+   cp -v /etc/skel/.bashrc /etc/skel/.bash_logout /etc/skel/.profile ${AIIDALAB_HOME}/
+   echo 'eval "$(verdi completioncommand)"' >> ${AIIDALAB_HOME}/.bashrc
+   echo 'export PYTHONPATH="${AIIDALAB_HOME}"' >> ${AIIDALAB_HOME}/.bashrc
 fi
 
 # update the list of installed plugins
-grep "reentry scan" ${AIIDA_HOME}/.bashrc || echo "reentry scan" >> ${AIIDA_HOME}/.bashrc
+grep "reentry scan" ${AIIDALAB_HOME}/.bashrc || echo "reentry scan" >> ${AIIDALAB_HOME}/.bashrc
 
 #===============================================================================
 # install/upgrade apps
-if [ ! -e ${AIIDA_HOME}/apps ]; then
-   mkdir ${AIIDA_HOME}/apps
-   touch ${AIIDA_HOME}/apps/__init__.py
-   git clone https://github.com/materialscloud-org/mc-home ${AIIDA_HOME}/apps/home
+if [ ! -e ${AIIDALAB_HOME}/apps ]; then
+   mkdir ${AIIDALAB_HOME}/apps
+   touch ${AIIDALAB_HOME}/apps/__init__.py
+   git clone https://github.com/materialscloud-org/mc-home ${AIIDALAB_HOME}/apps/home
 
    # make aiida demos discoverable by home app
-   ln -s ${AIIDA_HOME} ${AIIDA_HOME}/apps/aiida_demos
+   ln -s ${AIIDALAB_HOME} ${AIIDALAB_HOME}/apps/aiida_demos
 fi
 
-##===============================================================================
-##start Jupyter notebook server
-#cd ${AIIDA_HOME}
-#${SCRIPTS}/matcloud-jupyterhub-singleuser                              \
-#  --ip=0.0.0.0                                                   \
-#  --port=8888                                                    \
-#  --notebook-dir="${AIIDA_HOME}"                                      \
-#  --NotebookApp.iopub_data_rate_limit=1000000000                 \
-#  --NotebookApp.default_url="/apps/apps/home/start.ipynb"
-#
-##===============================================================================
-#
+psql_stop
 ##EOF
