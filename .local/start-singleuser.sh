@@ -85,6 +85,9 @@ if [ ! -e ${AIIDA_HOME}/apps ]; then
    mkdir ${AIIDA_HOME}/apps
    touch ${AIIDA_HOME}/apps/__init__.py
    git clone https://github.com/materialscloud-org/mc-home ${AIIDA_HOME}/apps/home
+
+   # make aiida demos discoverable by home app
+   ln -s ${AIIDA_HOME} ${AIIDA_HOME}/apps/aiida_demos
 fi
 
 ##===============================================================================

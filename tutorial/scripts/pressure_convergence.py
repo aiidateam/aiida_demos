@@ -4,12 +4,11 @@ if not is_dbenv_loaded():
     load_dbenv()
 
 from aiida.orm import load_node, CalculationFactory, DataFactory
-from aiida.orm.data.base import Float, Str, NumericType, BaseType
+from aiida.orm.data.base import Float, Str, NumericType
 from aiida.orm.code import Code
 from aiida.orm.data.structure import StructureData
 from aiida.work.run import run, submit
-from aiida.work.process_registry import ProcessRegistry
-from aiida.work.workchain import WorkChain, ToContext, while_, Outputs
+from aiida.work.workchain import WorkChain, ToContext, while_
 from common_wf import generate_scf_input_params
 from create_rescale import rescale, create_diamond_fcc
 
@@ -18,8 +17,8 @@ PwCalculation = CalculationFactory('quantumespresso.pw')
 
 GPa_to_eV_over_ang3 = 1./160.21766208
 
-def run_eos(structure, element="Si", code='pw-5.1@localhost', pseudo_family='GBRV_lda'):
-    return run(PressureConvergence, structure=structure, code=Str(code), pseudo_family=Str(pseudo_family), volume_tolerance=Float(0.1), _options={})
+def run_eos(structure, element="Si", code='qe-pw-6.2.1@localhost', pseudo_family='GBRV_lda'):
+    return run(PressureConvergence, structure=structure, code=Str(code), pseudo_family=Str(pseudo_family), volume_tolerance=Float(0.1))
 
 
 # Set up the factories
@@ -101,36 +100,35 @@ class PressureConvergence(WorkChain):
     	super(PressureConvergence, cls).define(spec)
         spec.input("structure", valid_type=StructureData)
         spec.input("volume_tolerance", valid_type=Float) #, default=Float(0.1))
-        spec.input("code", valid_type=Code)
+        spec.input("code", valid_type=Str)
         spec.input("pseudo_family", valid_type=Str)
         spec.outline(
-            cls.init,
+            cls.setup,
             cls.put_step0_in_ctx,
             cls.move_next_step,
             while_(cls.not_converged)(
                 cls.move_next_step,
             ),
-            cls.report
+            cls.finish
         )
-        spec.dynamic_output()
 
-    def init(self):
+    def setup(self):
         """
         Launch the first calculation for the input structure,
         and a second calculation for a shifted volume (increased by 4 angstrom^3)
         Store the outputs of the two calcs in r0 and r1
         """
-        print "Workchain node identifiers: {}".format(ProcessRegistry().current_calc_node)
+        print "Workchain node identifiers: {}".format(self.calc)
 
         inputs0 = generate_scf_input_params(
-            self.inputs.structure, str(self.inputs.code), str(self.inputs.pseudo_family))
+            self.inputs.structure, str(self.inputs.code), self.inputs.pseudo_family)
 
         initial_volume = self.inputs.structure.get_cell_volume()
         new_volume = initial_volume + 4. # In ang^3
 
         scaled_structure = get_structure(self.inputs.structure, new_volume)
         inputs1 = generate_scf_input_params(
-            scaled_structure, str(self.inputs.code), str(self.inputs.pseudo_family))
+            scaled_structure, str(self.inputs.code), self.inputs.pseudo_family)
 
         self.ctx.last_structure = scaled_structure
 
@@ -139,13 +137,13 @@ class PressureConvergence(WorkChain):
         future1 = submit(PwProcess, **inputs1)
 
         # Wait to complete before next step
-        return ToContext(r0=Outputs(future0), r1=Outputs(future1))
+        return ToContext(r0=future0, r1=future1)
 
     def put_step0_in_ctx(self):
         """
         Store the outputs of the very first step in a specific dictionary
         """
-        V, E, dE = get_volume_energy_and_derivative(self.ctx.r0['output_parameters'])
+        V, E, dE = get_volume_energy_and_derivative(self.ctx.r0.get_outputs_dict()['output_parameters'])
 
         self.ctx.step0 = {'V': V, 'E': E, 'dE': dE}
 
@@ -162,8 +160,10 @@ class PressureConvergence(WorkChain):
         r0 gets replaced with r1, r1 will get replaced by the results of the
         new calculation.
         """
-        ddE = get_second_derivative(self.ctx.r0['output_parameters'], self.ctx.r1['output_parameters'])
-        V, E, dE = get_volume_energy_and_derivative(self.ctx.r1['output_parameters'])
+        r0_out = self.ctx.r0.get_outputs_dict()
+        r1_out = self.ctx.r1.get_outputs_dict()
+        ddE = get_second_derivative(r0_out['output_parameters'], r1_out['output_parameters'])
+        V, E, dE = get_volume_energy_and_derivative(r1_out['output_parameters'])
         a,b,c = get_abc(V,E,dE,ddE)
 
         new_step_data = {'V': V, 'E': E, 'dE': dE, 'ddE': ddE,
@@ -179,23 +179,26 @@ class PressureConvergence(WorkChain):
         self.ctx.last_structure = scaled_structure
 
         inputs = generate_scf_input_params(
-            scaled_structure, str(self.inputs.code), str(self.inputs.pseudo_family))
+            scaled_structure, str(self.inputs.code), self.inputs.pseudo_family)
 
         # Run PW                                                                                                                     
         future = submit(PwProcess, **inputs)
         # Replace r1
-        return ToContext(r1=Outputs(future))
+        return ToContext(r1=future)
         
 
     def not_converged(self):
         """
         Return True if the worflow is not converged yet (i.e., the volume changed significantly)
         """
-        return abs(self.ctx.r1['output_parameters'].dict.volume - 
-                   self.ctx.r0['output_parameters'].dict.volume) > self.inputs.volume_tolerance
+        r0_out = self.ctx.r0.get_outputs_dict()
+        r1_out = self.ctx.r1.get_outputs_dict()
+
+        return abs(r1_out['output_parameters'].dict.volume - 
+                   r0_out['output_parameters'].dict.volume) > self.inputs.volume_tolerance
 
 
-    def report(self):
+    def finish(self):
         """
         Output final quantities
         """
