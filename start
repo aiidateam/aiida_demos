@@ -1,3 +1,4 @@
-source start_singleuser.sh
+#!/bin/bash
+source ~/.local/start-singleuser.sh
 
 exec "$@"
