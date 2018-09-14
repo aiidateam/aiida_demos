@@ -1,1 +1,4 @@
 reentry scan
+export AIIDA_HOME=$HOME
+export SCRIPTS=${HOME}/binder_scripts
+${SCRIPTS}/start-singleuser.sh

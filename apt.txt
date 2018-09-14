@@ -6,6 +6,7 @@ bzip2
 build-essential
 libssl-dev
 libffi-dev
+postgresql
 python-dev
 git
 gnupg
