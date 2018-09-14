@@ -13,7 +13,7 @@ PwCalculation = CalculationFactory('quantumespresso.pw')
 
 def generate_scf_input_params(structure, codename, pseudo_family):
     # The inputs
-    inputs = PwCalculation.process().get_inputs_template()
+    inputs = PwCalculation.get_builder()
 
     # The structure
     inputs.structure = structure
@@ -21,8 +21,8 @@ def generate_scf_input_params(structure, codename, pseudo_family):
     inputs.code = Code.get_from_string(codename)
     # calc.label = "PW test"
     # calc.description = "My first AiiDA calculation of Silicon with Quantum ESPRESSO"
-    inputs._options.resources = {"num_machines": 1}
-    inputs._options.max_wallclock_seconds = 30 * 60
+    inputs.options.resources = {"num_machines": 1}
+    inputs.options.max_wallclock_seconds = 30 * 60
 
     # Kpoints
     KpointsData = DataFactory("array.kpoints")
