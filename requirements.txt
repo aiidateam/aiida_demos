@@ -1,1 +1,1 @@
-aiidalab-metapkg==18.09.0
+aiidalab==18.09.0
