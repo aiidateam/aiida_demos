@@ -47,13 +47,6 @@ if [ ! -d ${AIIDA_HOME}/.aiida ]; then
    # start the daemon
    verdi daemon start
 
-   # setup pseudopotentials
-   if [ ! -e ${AIIDA_HOME}/SKIP_IMPORT_PSEUDOS ]; then
-      cd ${SCRIPTS}/pseudos
-      for i in *; do
-         verdi import $i
-      done
-   fi
 
 else
     if [ $aiida_backend = "django" ]; then
