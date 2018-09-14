@@ -1,3 +1,0 @@
-source start_singleuser.sh
-
-exec "$@"

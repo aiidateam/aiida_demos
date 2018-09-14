@@ -1,4 +1,4 @@
 jupyter nbextension     enable --py --sys-prefix appmode
 jupyter serverextension enable --py --sys-prefix appmode
 reentry scan
-start-singleuser.sh
+.local/start-singleuser.sh
