@@ -1,1 +1,1 @@
-aiidalab==18.09.0
+git+https://github.com/materialscloud-org/aiidalab-metapkg@v18.09.1rc1
