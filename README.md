@@ -28,4 +28,4 @@ pip install repo2docker
 repo2docker .
 ```
 In order to go directly to app-mode, use the URL
-`http://127.0.0.1:58901/apps/apps/home/start.ipynb`
+`http://127.0.0.1:<port>/apps/apps/home/start.ipynb`

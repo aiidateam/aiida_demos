@@ -1,7 +1,10 @@
 #!/bin/bash -e
-
 # This script is executed whenever the docker container is (re)started.
+
+#===============================================================================
+# set aiidalab variables
 export AIIDALAB_HOME=$HOME
+export AIIDALAB_APPS=$HOME/apps
 export AIIDALAB_SCRIPTS=${HOME}/.local
 
 #===============================================================================
@@ -35,7 +38,7 @@ if [ ! -d ${AIIDALAB_HOME}/.aiida ]; then
       --db_name aiidadb                 \
       --db_host localhost               \
       --db_port 5432                    \
-      --repo ${AIIDALAB_HOME}/aiida_repository \
+      --repo ${AIIDALAB_HOME}/.aiida/repository-default \
       default
 
    verdi profile setdefault verdi default
@@ -82,14 +85,11 @@ grep "reentry scan" ${AIIDALAB_HOME}/.bashrc || echo "reentry scan" >> ${AIIDALA
 
 #===============================================================================
 # install/upgrade apps
-if [ ! -e ${AIIDALAB_HOME}/apps ]; then
-   mkdir ${AIIDALAB_HOME}/apps
-   touch ${AIIDALAB_HOME}/apps/__init__.py
-   git clone https://github.com/materialscloud-org/mc-home ${AIIDALAB_HOME}/apps/home
+if [ ! -e ${AIIDALAB_APPS} ]; then
+   mkdir ${AIIDALAB_APPS}
+   touch ${AIIDALAB_APPS}/__init__.py
+   git clone https://github.com/materialscloud-org/mc-home ${AIIDALAB_APPS}/home
 
-   # make aiida demos discoverable by home app
-   ln -s ${AIIDALAB_HOME} ${AIIDALAB_HOME}/apps/aiida_demos
 fi
 
-psql_stop
 ##EOF
