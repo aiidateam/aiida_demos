@@ -2,6 +2,7 @@
 set -ex
 
 # this also sets environment variables
-source .local/start_singleuser.sh
+source activate kernel
+source .local/start-singleuser.sh
 
 exec "$@"
