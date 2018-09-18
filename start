@@ -1,0 +1,7 @@
+#!/bin/bash
+set -ex
+
+# this also sets environment variables
+source .local/start_singleuser.sh
+
+exec "$@"
