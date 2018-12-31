@@ -12,4 +12,5 @@ services:
 before_install:
     - pip install jupyter-repo2docker
 
-script: repo2docker .
+# test building container only
+script: repo2docker . --no-run
