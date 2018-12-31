@@ -1,16 +1,15 @@
 dist: trusty
 sudo: required
 
-language: python
-
 python:
-    - "3.6"
+  - "3.6"
 
 services:
-    - docker
+  - docker
 
-before_install:
-    - pip install jupyter-repo2docker
+install:
+  - pip install jupyter-repo2docker
+
 
 # test building container only
 script: repo2docker . --no-run
