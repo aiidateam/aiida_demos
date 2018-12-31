@@ -13,4 +13,4 @@ install:
 
 
 # test building container only
-script: repo2docker . --no-run
+script: repo2docker --no-run .
