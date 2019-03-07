@@ -1,4 +1,8 @@
 {
-    "description": "jupyter notebooks demonstrating how to use AiiDA",
-    "title": "AiiDA Tutorials"
+    "title": "AiiDA Tutorials",
+    "description": "A collection of Jupyter notebooks demonstrating how to use AiiDA",
+    "authors": "AiiDA Team",
+    "version": "0.1.0",
+    "logo": "miscellaneous/logos/aiida.png",
+    "state": "stable"
 }
